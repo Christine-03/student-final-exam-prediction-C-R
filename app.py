@@ -44,7 +44,7 @@ st.markdown("Predict **Final Exam Score** or **Pass/Fail Outcome** using AI mode
 prediction_type = st.sidebar.radio("Select Prediction Type", ("Final Exam Score", "Pass/Fail Outcome"))
 
 # ------------------------------------------------
-# User Input Form
+#                 User Input Form
 # ------------------------------------------------
 with st.form(key='student_input_form'):
     st.subheader("Enter Student Details")
@@ -67,7 +67,7 @@ with st.form(key='student_input_form'):
     submit_btn = st.form_submit_button(label="Predict")
 
 # ------------------------------------------------
-# Make Prediction
+#                 Make Prediction
 # ------------------------------------------------
 if submit_btn:
     # Prepare input dataframe
@@ -80,7 +80,7 @@ if submit_btn:
         elif col == "Extracurricular_Activities":
             input_dict[col] = 1 if extra == "Yes" else 0
         elif col in parental_cols:
-            input_dict[col] = 1 if col == f"Parental_Education_Level_{parental_option}" else 0
+            input_dict[col] = 1 if col == f"\nParental_Education_Level_{parental_option}" else 0
         elif col == "Study_Hours_per_Week":
             input_dict[col] = study_hours
         elif col == "Attendance_Rate":
@@ -115,3 +115,4 @@ if submit_btn:
         st.success(f"**Predicted Student Outcome:** {predicted_label}")
         st.info(f"Probability to Pass: {proba[1]*100:.2f}%")
         st.warning(f"Probability to Fail: {proba[0]*100:.2f}%")
+
