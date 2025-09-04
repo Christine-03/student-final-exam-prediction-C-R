@@ -31,8 +31,13 @@ st.set_page_config(page_title="Student Predictor", page_icon="🎓", layout="wid
 st.title("🎓 Student Performance Predictor")
 st.markdown("Predict **Final Exam Score** or **Pass/Fail Outcome** with AI models.")
 
+# -----------------------------
 # Sidebar: choose prediction type
-prediction_type = st.sidebar.radio("Select Prediction Type", ("Final Exam Score", "Pass/Fail Outcome"))
+# -----------------------------
+prediction_type = st.sidebar.radio(
+    "Select Prediction Type",
+    ("Final Exam Score", "Pass/Fail Outcome")
+)
 
 # -----------------------------
 # Input Section (Card)
@@ -109,4 +114,5 @@ if submit_btn:
             st.success(f"**Predicted Student Outcome:** {predicted_label}")
             st.info(f"Probability to Pass: {proba[1]*100:.2f}%")
             st.warning(f"Probability to Fail: {proba[0]*100:.2f}%")
+
 
