@@ -1,7 +1,6 @@
 # app.py
 import streamlit as st
 import pandas as pd
-import numpy as np
 from joblib import load
 
 # -----------------------------
@@ -32,22 +31,26 @@ st.set_page_config(page_title="Student Predictor", page_icon="🎓", layout="wid
 st.title("🎓 Student Performance Predictor")
 st.markdown("Predict **Final Exam Score** or **Pass/Fail Outcome** with AI models.")
 
-# Sidebar: choose prediction type
-prediction_type = st.sidebar.radio("Select Prediction Type", ("Final Exam Score", "Pass/Fail Outcome"))
-
 # -----------------------------
 # Input Section (Card)
 # -----------------------------
 with st.container():
     st.subheader("📝 Student Details")
     with st.form(key='student_form'):
+        # Main page: Prediction Type
+        prediction_type = st.radio("Select Prediction Type", ("Final Exam Score", "Pass/Fail Outcome"))
+        
+        # Binary inputs
         gender = st.selectbox("Gender", ["Male", "Female"])
         internet = st.selectbox("Internet Access at Home", ["No", "Yes"])
         extra = st.selectbox("Extracurricular Activities", ["No", "Yes"])
+        
+        # Numeric inputs
         study_hours = st.number_input("Study Hours per Week", 0, 100, 10)
         attendance = st.number_input("Attendance Rate (%)", 0, 100, 90)
         past_scores = st.number_input("Past Exam Scores", 0, 100, 75)
         
+        # Parental education
         st.markdown("**Parental Education Level**")
         parental_option = st.selectbox("Choose Level", [col.replace("Parental_Education_Level_", "") for col in parental_cols])
         
@@ -76,9 +79,9 @@ if submit_btn:
     
     input_df = pd.DataFrame([input_dict], columns=reg_features)
     
-    # Display result in a colored card-like box
     with st.container():
         st.subheader("📊 Prediction Result")
+        
         if prediction_type == "Final Exam Score":
             predicted_score = int(round(reg_model.predict(input_df.values)[0]))
             student_grade = grade(predicted_score)
