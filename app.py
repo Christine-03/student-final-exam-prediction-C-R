@@ -15,7 +15,7 @@ clf_model, clf_features = clf_loaded[0], clf_loaded[1]
 parental_cols = [col for col in reg_features if col.startswith('Parental_Education_Level_')]
 
 # -----------------------------
-# Helper functions
+# Helper function
 # -----------------------------
 def grade(score):
     if score >= 90: return "A"
@@ -32,39 +32,47 @@ st.title("🎓 Student Performance Predictor")
 st.markdown("Predict **Final Exam Score** or **Pass/Fail Outcome** with AI models.")
 
 # -----------------------------
-# Sidebar: choose prediction type
+# Sidebar: Prediction Type
 # -----------------------------
-prediction_type = st.sidebar.radio(
+prediction_type_sidebar = st.sidebar.radio(
     "Select Prediction Type",
     ("Final Exam Score", "Pass/Fail Outcome")
 )
 
 # -----------------------------
-# Input Section (Card)
+# Input Section
 # -----------------------------
-with st.container():
+with st.form(key='student_form'):
     st.subheader("📝 Student Details")
-    with st.form(key='student_form'):
-        # Main page: Prediction Type
-        prediction_type = st.radio("Select Prediction Type", ("Final Exam Score", "Pass/Fail Outcome"))
-        
-        # Binary inputs
-        gender = st.selectbox("Gender", ["Male", "Female"])
-        internet = st.selectbox("Internet Access at Home", ["No", "Yes"])
-        extra = st.selectbox("Extracurricular Activities", ["No", "Yes"])
-        
-        # Numeric inputs
-        study_hours = st.number_input("Study Hours per Week", 0, 100, 10)
-        attendance = st.number_input("Attendance Rate (%)", 0, 100, 90)
-        past_scores = st.number_input("Past Exam Scores", 0, 100, 75)
-        
-        # Parental Education
-        chosen_level = st.selectbox("Parental Education Level", [c.replace("Parental_Education_Level_", "") for c in parental_cols])
-        
-        submit_btn = st.form_submit_button(label="Predict", use_container_width=True)
+
+    # Optional main page Prediction Type
+    prediction_type = st.radio(
+        "Select Prediction Type",
+        ("Final Exam Score", "Pass/Fail Outcome"),
+        horizontal=True
+    )
+
+    # Binary inputs
+    gender = st.selectbox("Gender", ["Male", "Female"])
+    internet = st.selectbox("Internet Access at Home", ["No", "Yes"])
+    extra = st.selectbox("Extracurricular Activities", ["No", "Yes"])
+
+    # Numeric inputs
+    study_hours = st.number_input("Study Hours per Week", 0, 100, 10)
+    attendance = st.number_input("Attendance Rate (%)", 0, 100, 90)
+    past_scores = st.number_input("Past Exam Scores", 0, 100, 75)
+
+    # Parental Education
+    chosen_level = st.selectbox(
+        "Parental Education Level",
+        [c.replace("Parental_Education_Level_", "") for c in parental_cols]
+    )
+
+    # Horizontal Predict button
+    submit_btn = st.form_submit_button(label="Predict", use_container_width=True)
 
 # -----------------------------
-# Prediction Section (Card)
+# Prediction Section
 # -----------------------------
 if submit_btn:
     input_dict = {}
@@ -76,26 +84,26 @@ if submit_btn:
         elif col == "Extracurricular_Activities":
             input_dict[col] = 1 if extra == "Yes" else 0
         elif col in parental_cols:
-            input_dict[col] = 1 if col == f"Parental_Education_Level_{parental_option}" else 0
+            input_dict[col] = 1 if col == f"Parental_Education_Level_{chosen_level}" else 0
         elif col == "Study_Hours_per_Week":
             input_dict[col] = study_hours
         elif col == "Attendance_Rate":
             input_dict[col] = attendance
         elif col == "Past_Exam_Scores":
             input_dict[col] = past_scores
-    
+
     input_df = pd.DataFrame([input_dict], columns=reg_features)
-    
+
+    # Display prediction in a card
     with st.container():
         st.subheader("📊 Prediction Result")
-        
         if prediction_type == "Final Exam Score":
             predicted_score = int(round(reg_model.predict(input_df.values)[0]))
             student_grade = grade(predicted_score)
-            
+
             st.success(f"**Predicted Final Exam Score:** {predicted_score}")
             st.info(f"**Predicted Grade:** {student_grade}")
-            
+
             st.markdown("""
             **Grade Ranges:**
             - A: 90-100
@@ -109,11 +117,7 @@ if submit_btn:
             predicted_class = clf_model.predict(input_df_class.values)[0]
             proba = clf_model.predict_proba(input_df_class.values)[0]
             predicted_label = "Pass" if predicted_class == 1 else "Fail"
-            
+
             st.success(f"**Predicted Student Outcome:** {predicted_label}")
             st.info(f"Probability to Pass: {proba[1]*100:.2f}%")
             st.warning(f"Probability to Fail: {proba[0]*100:.2f}%")
-
-
-
-
