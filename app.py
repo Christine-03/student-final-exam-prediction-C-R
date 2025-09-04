@@ -38,45 +38,50 @@ def grade(score):
 st.set_page_config(page_title="Student Performance Predictor", page_icon=":mortar_board:", layout="centered")
 st.title("🎓 Student Performance Predictor")
 
-st.info("Fill in the student details to predict the **Final Exam Score** or **Pass/Fail outcome**.")
+# Instruction text (no color)
+st.write("Fill in the student details to predict the Final Exam Score or Pass/Fail outcome.")
 
 # ----------------------------
-# Student Information & Prediction Type Box
+# Student Info & Prediction Type Box
 # ----------------------------
-with st.container():
-    st.header("📝 Student Information")
+st.markdown("""
+<div style="border:1px solid #000; padding:15px; border-radius:5px;">
+""", unsafe_allow_html=True)
 
-    user_input_values = {}
+st.subheader("📝 Student Information")
 
-    # Gender
-    user_input_values['Gender'] = st.radio("Gender:", options=[0, 1], format_func=lambda x: "Male" if x==0 else "Female")
+user_input_values = {}
 
-    # Internet Access at Home
-    user_input_values['Internet_Access_at_Home'] = st.radio("Internet Access at Home:", options=[0, 1], format_func=lambda x: "No" if x==0 else "Yes")
+# Gender
+user_input_values['Gender'] = st.radio("Gender:", options=[0, 1], format_func=lambda x: "Male" if x==0 else "Female")
 
-    # Extracurricular Activities
-    user_input_values['Extracurricular_Activities'] = st.radio("Extracurricular Activities:", options=[0, 1], format_func=lambda x: "No" if x==0 else "Yes")
+# Internet Access at Home
+user_input_values['Internet_Access_at_Home'] = st.radio("Internet Access at Home:", options=[0, 1], format_func=lambda x: "No" if x==0 else "Yes")
 
-    # Numeric inputs
-    for col in ['Study_Hours_per_Week', 'Attendance_Rate', 'Past_Exam_Scores']:
-        min_val, max_val = valid_ranges[col]
-        user_input_values[col] = st.number_input(f"{col} (between {min_val} and {max_val})", min_value=min_val, max_value=max_val, value=(min_val+max_val)//2)
+# Extracurricular Activities
+user_input_values['Extracurricular_Activities'] = st.radio("Extracurricular Activities:", options=[0, 1], format_func=lambda x: "No" if x==0 else "Yes")
 
-    # Parental Education Level (One-hot)
-    st.subheader("Parental Education Level")
-    options = [col.replace("Parental_Education_Level_", "") for col in parental_cols]
-    chosen_level = st.selectbox("Select Parental Education Level:", options)
-    for col in parental_cols:
-        user_input_values[col] = 0
-    one_hot_col = f"Parental_Education_Level_{chosen_level}"
-    user_input_values[one_hot_col] = 1
+# Numeric inputs
+for col in ['Study_Hours_per_Week', 'Attendance_Rate', 'Past_Exam_Scores']:
+    min_val, max_val = valid_ranges[col]
+    user_input_values[col] = st.number_input(f"{col} (between {min_val} and {max_val})", min_value=min_val, max_value=max_val, value=(min_val+max_val)//2)
 
-    # Convert to DataFrame
-    input_df = pd.DataFrame([user_input_values], columns=reg_features)
+# Parental Education Level (One-hot)
+options = [col.replace("Parental_Education_Level_", "") for col in parental_cols]
+chosen_level = st.selectbox("Parental Education Level", options)
+for col in parental_cols:
+    user_input_values[col] = 0
+one_hot_col = f"Parental_Education_Level_{chosen_level}"
+user_input_values[one_hot_col] = 1
 
-    # Prediction Type
-    st.header("📊 Prediction Type")
-    prediction_type = st.radio("Select prediction type:", ("Final Exam Score", "Pass/Fail Outcome"))
+# Convert to DataFrame
+input_df = pd.DataFrame([user_input_values], columns=reg_features)
+
+# Prediction Type
+st.subheader("📊 Prediction Type")
+prediction_type = st.radio("Select prediction type:", ("Final Exam Score", "Pass/Fail Outcome"))
+
+st.markdown("</div>", unsafe_allow_html=True)  # Close the box
 
 # ----------------------------
 # Prediction Button
@@ -90,16 +95,21 @@ if st.button("Predict"):
         st.info(f"Predicted Grade: {student_grade}")
 
         # Grade Ranges Box
-        with st.container():
-            st.subheader("Grade Ranges")
-            for g, (low, high) in {
-                "A": (90, 100),
-                "B": (80, 89),
-                "C": (70, 79),
-                "D": (60, 69),
-                "F": (0, 59)
-            }.items():
-                st.write(f"{g}: {low} - {high}")
+        st.markdown("""
+        <div style="border:1px solid #000; padding:10px; border-radius:5px;">
+        <h4>Grade Ranges</h4>
+        """, unsafe_allow_html=True)
+
+        for g, (low, high) in {
+            "A": (90, 100),
+            "B": (80, 89),
+            "C": (70, 79),
+            "D": (60, 69),
+            "F": (0, 59)
+        }.items():
+            st.write(f"{g}: {low} - {high}")
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     elif prediction_type == "Pass/Fail Outcome":
         input_df_class = input_df[clf_features]
