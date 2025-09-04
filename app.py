@@ -58,11 +58,14 @@ with st.container():
         attendance = st.number_input("Attendance Rate (%)", 0, 100, 90)
         past_scores = st.number_input("Past Exam Scores", 0, 100, 75)
         
-        # Parental education
-        st.markdown("**Parental Education Level**")
-        parental_option = st.selectbox("Choose Level", [col.replace("Parental_Education_Level_", "") for col in parental_cols])
+        # Parental Education
+        options = [c.replace("Parental_Education_Level_", "") for c in parental_cols]
+        chosen_level = st.selectbox("Parental Education Level", options)
+        one_hot_col_name = f"Parental_Education_Level_{chosen_level}"
+        if one_hot_col_name in user_input_values:
+        user_input_values[one_hot_col_name] = 1.0
         
-        submit_btn = st.form_submit_button(label="Predict")
+        submit_btn = st.form_submit_button(label="Predict", use_container_width=True)
 
 # -----------------------------
 # Prediction Section (Card)
@@ -114,5 +117,6 @@ if submit_btn:
             st.success(f"**Predicted Student Outcome:** {predicted_label}")
             st.info(f"Probability to Pass: {proba[1]*100:.2f}%")
             st.warning(f"Probability to Fail: {proba[0]*100:.2f}%")
+
 
 
